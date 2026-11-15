@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Linking, Pressable, Text, View } from 'react-native';
 import { colors } from '../theme';
 import { Screen as S, useStore } from '../store';
 import { Page } from '../components/Screen';
@@ -47,12 +47,13 @@ const jam = (s: string) => s.replace(':', '.');
 export default function Home() {
   const { go, user } = useStore();
   const { data, error, loading, reload } = useLoad(async () => {
-    const [beranda, tagihan, lab, notif, kunjungan] = await Promise.all([
+    const [beranda, tagihan, lab, notif, kunjungan, bed, info] = await Promise.all([
       api.beranda(), api.tagihan(), api.lab(), api.notifikasi(), api.kunjunganHariIni().catch(() => null),
+      api.tempatTidur().catch(() => null), api.info().catch(() => null),
     ]);
     const aktif = beranda.antrian_aktif;
     const status = aktif ? await api.antrianStatus(aktif.id).catch(() => null) : null;
-    return { beranda, tagihan, lab, belumDibaca: notif.belum_dibaca, kunjungan, status };
+    return { beranda, tagihan, lab, belumDibaca: notif.belum_dibaca, kunjungan, status, bed, info };
   });
 
   const aktif = data?.beranda.antrian_aktif;
@@ -170,6 +171,23 @@ export default function Home() {
           ) : null}
           {!resepSiap && belumBayar.length === 0 && !labTerbaru ? (
             <Alert icon="check" iconColor={colors.primary} bg={colors.primarySoft} title="Tidak ada yang perlu ditindaklanjuti" sub="Semua tagihan lunas" />
+          ) : null}
+        </>
+      ) : null}
+      {data ? (
+        <>
+          <Text style={T.h3}>Info rumah sakit</Text>
+          <Alert icon="clock" iconColor={colors.primary} bg={colors.primarySoft} onPress={() => go('jadwalDokter')}
+            title="Jadwal dokter" sub="Lihat jadwal praktik dan sisa kuota" />
+          {data.bed ? (
+            <Alert icon="home" iconColor={colors.primary} bg={colors.primarySoft} onPress={() => go('tempatTidur')}
+              title="Ketersediaan tempat tidur"
+              sub={`${data.bed.tersedia} bed tersedia · diperbarui ${new Date(data.bed.diperbarui).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.')}`} />
+          ) : null}
+          {data.info?.cs_whatsapp ? (
+            <Alert icon="bell" iconColor={colors.primary} bg={colors.primarySoft}
+              onPress={() => void Linking.openURL(`https://wa.me/${data.info!.cs_whatsapp!.replace(/\D/g, '')}`)}
+              title="Hubungi CS" sub="Chat WhatsApp dengan layanan pelanggan" />
           ) : null}
         </>
       ) : null}

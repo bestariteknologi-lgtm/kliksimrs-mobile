@@ -7,12 +7,12 @@ import type { AuthResult, CaraBayarJenis, PayMetode, Pembayaran, Profil } from '
 
 export type Screen =
   | 'splash' | 'login' | 'register' | 'forgot' | 'home' | 'queue' | 'ticket' | 'records' | 'lab'
-  | 'pay' | 'payDetail' | 'success' | 'profile' | 'notif' | 'akun' | 'live' | 'kunjungan' | 'ringkasan';
+  | 'pay' | 'payDetail' | 'success' | 'profile' | 'notif' | 'akun' | 'live' | 'kunjungan' | 'ringkasan' | 'jadwalDokter' | 'tempatTidur';
 
 type State = {
   screen: Screen;
   user: Profil | null;
-  poliId: string | null; dokterId: string | null;
+  poliId: string | null; dokterId: string | null; tanggal: string | null;
   cara: CaraBayarJenis; asuransiId: string | null;
   payMethod: PayMetode; recTab: number;
   antrianId: string | null; labId: string | null; tagihanId: string | null; ringkasanId: string | null;
@@ -20,14 +20,14 @@ type State = {
 };
 
 const initial: State = {
-  screen: 'splash', user: null, poliId: null, dokterId: null, cara: 'UMUM', asuransiId: null,
+  screen: 'splash', user: null, poliId: null, dokterId: null, tanggal: null, cara: 'UMUM', asuransiId: null,
   payMethod: 'QRIS', recTab: 0, antrianId: null, labId: null, tagihanId: null, ringkasanId: null, payment: null,
 };
 
 const BACK: Partial<Record<Screen, Screen>> = {
   ticket: 'live', live: 'home', kunjungan: 'home', ringkasan: 'records', lab: 'records', payDetail: 'pay', success: 'pay',
   queue: 'home', records: 'home', pay: 'home', profile: 'home', register: 'login', forgot: 'login',
-  notif: 'home', akun: 'profile',
+  notif: 'home', akun: 'profile', jadwalDokter: 'home', tempatTidur: 'home',
 };
 
 type Store = State & {

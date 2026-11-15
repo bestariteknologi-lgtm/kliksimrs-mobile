@@ -13,7 +13,7 @@ const TABS: { key: string; label: string; icon: string; target: Screen; match: S
   { key: 'profile', label: 'Profil', icon: 'user', target: 'profile', match: ['profile', 'akun'] },
 ];
 
-export const TAB_SCREENS: Screen[] = ['home', 'queue', 'live', 'kunjungan', 'notif', 'records', 'ringkasan', 'pay', 'profile', 'akun'];
+export const TAB_SCREENS: Screen[] = ['home', 'queue', 'live', 'kunjungan', 'notif', 'records', 'ringkasan', 'pay', 'profile', 'akun', 'jadwalDokter', 'tempatTidur'];
 
 export function TabBar() {
   const { screen, go } = useStore();

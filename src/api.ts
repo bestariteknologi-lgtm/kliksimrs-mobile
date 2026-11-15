@@ -1,7 +1,7 @@
 import { config } from './config';
 import { saveToken } from './session';
 import type {
-  Alergi, AuthResult, KunjunganHariIni, NotifikasiList, Preferensi, Ringkasan, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
+  Alergi, AuthResult, InfoRs, JadwalDokter, TempatTidur, KunjunganHariIni, NotifikasiList, Preferensi, Ringkasan, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
   PayMetode, Pembayaran, Poliklinik, Profil, ResepItem, Tagihan, TagihanDetail,
 } from './types';
 
@@ -93,7 +93,10 @@ export type RegisterInput = {
 
 export const api = {
   // --- auth (publik)
-  info: () => request<{ nama_rs: string | null; alamat: string | null; telepon: string | null }>('GET', '/info', undefined, false),
+  info: () => request<InfoRs>('GET', '/info', undefined, false),
+  jadwalDokter: (tanggal: string, q = '', poliklinikId = '') =>
+    get<JadwalDokter>(`/jadwal-dokter?tanggal=${tanggal}${q ? `&q=${encodeURIComponent(q)}` : ''}${poliklinikId ? `&poliklinik_id=${poliklinikId}` : ''}`),
+  tempatTidur: () => get<TempatTidur>('/tempat-tidur'),
   checkIdentitas: (nik: string) => post<{ terdaftar_di_rs: boolean; punya_akun: boolean }>('/auth/check-identitas', { nik }, false),
   otpKirim: (p: { nik: string; nomor_hp: string; purpose: 'register' | 'reset_password' }) => post<null>('/auth/otp/kirim', p, false),
   otpVerifikasi: (p: { nomor_hp: string; purpose: 'register' | 'reset_password'; kode: string }) =>

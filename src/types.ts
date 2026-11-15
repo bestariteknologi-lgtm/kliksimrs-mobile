@@ -97,3 +97,20 @@ export type Notifikasi = {
   data: { antrian_id?: string; pembayaran_id?: string } | null;
 };
 export type NotifikasiList = { belum_dibaca: number; items: Notifikasi[] };
+
+export type DokterInfo = {
+  dokter_id: string; nama: string; spesialis: string | null; poliklinik_id: string; poliklinik: string; jam: string;
+  kuota: number; terpakai: number; sisa_kuota: number; status: 'tersedia' | 'penuh'; tanggal_berikutnya: string | null;
+};
+export type JadwalDokter = {
+  tanggal: string; bisa_daftar: boolean; libur: string | null; poliklinik: { id: string; nama: string }[];
+  jumlah_dokter: number; dokter: DokterInfo[];
+};
+export type KelasBed = {
+  nama: string; kategori: 'rawat_inap' | 'intensif' | 'isolasi'; total: number; terisi: number;
+  tidak_tersedia: number; tersedia: number; status: 'tersedia' | 'terbatas' | 'penuh';
+};
+export type TempatTidur = { total: number; tersedia: number; terisi: number; kelas: KelasBed[]; diperbarui: string };
+export type InfoRs = {
+  nama_rs: string | null; alamat: string | null; telepon: string | null; cs_whatsapp: string | null; telepon_igd: string | null;
+};

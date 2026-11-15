@@ -42,9 +42,9 @@ function statusTanggal(j: Jadwal | undefined, dokterId: string | null): { ok: bo
 
 // Daftar berobat dalam 3 langkah: poli → dokter → tanggal, sesi & penjamin, lalu ambil nomor antrean.
 export default function Queue() {
-  const { go, set, poliId, dokterId, cara, asuransiId, user } = useStore();
+  const { go, set, poliId, dokterId, cara, asuransiId, user, tanggal: tanggalAwal } = useStore();
   const [langkah, setLangkah] = useState<1 | 2 | 3>(poliId && dokterId ? 3 : poliId ? 2 : 1);
-  const [tanggal, setTanggal] = useState<string | null>(null);
+  const [tanggal, setTanggal] = useState<string | null>(tanggalAwal);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -107,7 +107,7 @@ export default function Queue() {
         poliklinik_id: poliId, dokter_id: dokterId, cara_bayar: cara, tanggal,
         ...(cara === 'ASURANSI' && asuransiId ? { perusahaan_asuransi_id: asuransiId } : {}),
       });
-      set({ poliId: null, dokterId: null });
+      set({ poliId: null, dokterId: null, tanggal: null });
       go('live', { antrianId: a.id });
     } catch (e) {
       // Koneksi putus/timeout: antrean bisa saja sudah terbentuk di server. Cek dulu sebelum menampilkan error.
@@ -115,7 +115,7 @@ export default function Queue() {
         try {
           const lists = await Promise.all([api.antrianAktif(), api.antrianMendatang()]);
           const baru = lists.flat().find(x => x.tanggal === tanggal);
-          if (baru) { set({ poliId: null, dokterId: null }); go('live', { antrianId: baru.id }); return; }
+          if (baru) { set({ poliId: null, dokterId: null, tanggal: null }); go('live', { antrianId: baru.id }); return; }
         } catch { /* jatuh ke pesan error */ }
       }
       setErr((e as Error).message);
