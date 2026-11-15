@@ -66,7 +66,7 @@ export type Ringkasan = {
 };
 
 export type Tahap = {
-  kode: string; label: string; keterangan: string; selesai: boolean; state: 'selesai' | 'sekarang' | 'menunggu';
+  kode: string; label: string; keterangan: string; waktu?: string | null; selesai: boolean; state: 'selesai' | 'sekarang' | 'menunggu';
   lokasi?: string | null; antrian_id?: string;
 };
 export type ResepStatus = {

@@ -111,9 +111,16 @@ export default function Kunjungan() {
                     {!terakhir ? <View style={{ flex: 1, width: 2, minHeight: 18, backgroundColor: t.state === 'selesai' ? colors.primary : colors.border }} /> : null}
                   </View>
                   <View style={{ flex: 1, gap: 2, paddingBottom: terakhir ? 0 : 14 }}>
-                    <Text style={{ fontSize: 14, fontWeight: t.state === 'sekarang' ? '700' : '600', color: t.state === 'sekarang' ? colors.primary : t.state === 'menunggu' ? colors.muted : colors.text }}>
-                      {t.state === 'sekarang' ? `Sekarang: ${t.label}` : t.label}
-                    </Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <Text style={{ flex: 1, fontSize: 14, fontWeight: t.state === 'sekarang' ? '700' : '600', color: t.state === 'sekarang' ? colors.primary : t.state === 'menunggu' ? colors.muted : colors.text }}>
+                        {t.state === 'sekarang' ? `Sekarang: ${t.label}` : t.label}
+                      </Text>
+                      {t.waktu && t.state !== 'menunggu' ? (
+                        <Text accessibilityLabel={`Pukul ${jam(t.waktu)}`} style={{ fontSize: 13, fontWeight: '700', color: t.state === 'sekarang' ? colors.primary : colors.muted }}>
+                          {t.state === 'sekarang' ? 'sejak ' : ''}{jam(t.waktu)}
+                        </Text>
+                      ) : null}
+                    </View>
                     {t.keterangan ? <Text style={T.muted}>{t.keterangan}</Text> : null}
                     {t.state === 'sekarang' && t.lokasi ? <Text style={T.muted}>{t.lokasi}</Text> : null}
                   </View>

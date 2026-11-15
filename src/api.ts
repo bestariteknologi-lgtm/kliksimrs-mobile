@@ -105,7 +105,7 @@ export const api = {
 
   // --- akun
   me: () => get<Profil>('/me'),
-  updateProfil: (p: { nomor_hp?: string; email?: string | null; alamat?: string | null }) => request<Profil>('PUT', '/me', p),
+  updateProfil: (p: { nomor_hp?: string; email?: string | null; alamat?: string | null; nik?: string; nomor_bpjs?: string | null; password?: string }) => request<Profil>('PUT', '/me', p),
   updatePassword: (password_lama: string, password_baru: string) => request<null>('PUT', '/me/password', { password_lama, password_baru }),
   beranda: () => get<Beranda>('/beranda'),
 

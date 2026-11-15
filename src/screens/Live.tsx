@@ -46,6 +46,8 @@ export default function Live() {
   const st = status.data;
   const loading = (resolve.loading || tiket.loading) && !a;
   const dipanggil = !!st?.sudah_dipanggil;
+  // Hanya false yang berarti tanggal mendatang; server lama tidak mengirim bidang ini → anggap hari ini.
+  const mendatang = st?.hari_ini === false && !!st.tanggal;
 
   return (
     <Page gap={16}>
@@ -82,8 +84,8 @@ export default function Live() {
             <View style={{ backgroundColor: colors.primarySoft, borderRadius: 14, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <Icon name="clock" size={28} />
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={{ fontSize: 12, color: colors.primaryDark, fontWeight: '600' }}>{st && !st.hari_ini ? 'Tanggal kunjungan' : dipanggil ? 'Status' : 'Perkiraan dipanggil'}</Text>
-                {st && !st.hari_ini ? (
+                <Text style={{ fontSize: 12, color: colors.primaryDark, fontWeight: '600' }}>{mendatang ? 'Tanggal kunjungan' : dipanggil ? 'Status' : 'Perkiraan dipanggil'}</Text>
+                {mendatang && st ? (
                   <>
                     <Text style={{ fontSize: 20, fontWeight: '800', color: colors.primaryDark }}>
                       {new Date(`${st.tanggal}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}
