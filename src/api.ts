@@ -25,9 +25,9 @@ export const setUnauthorizedHandler = (fn: (() => void) | null) => { onUnauthori
 /** Pasang token dari penyimpanan tanpa menulis ulang ke penyimpanan. */
 export const restoreToken = (t: string | null) => { token = t; };
 
-async function raw(method: string, path: string, body?: unknown, auth = true): Promise<Response> {
+async function raw(method: string, path: string, body?: unknown, auth = true, timeoutMs = TIMEOUT_MS): Promise<Response> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     return await fetch(`${BASE}${path}`, {
       method,
@@ -63,11 +63,11 @@ async function tryRefresh(): Promise<boolean> {
   return refreshing;
 }
 
-async function request<T>(method: string, path: string, body?: unknown, auth = true): Promise<T> {
-  let res = await raw(method, path, body, auth);
+async function request<T>(method: string, path: string, body?: unknown, auth = true, timeoutMs = TIMEOUT_MS): Promise<T> {
+  let res = await raw(method, path, body, auth, timeoutMs);
 
   if (res.status === 401 && auth && token && path !== '/auth/refresh') {
-    if (await tryRefresh()) res = await raw(method, path, body, auth);
+    if (await tryRefresh()) res = await raw(method, path, body, auth, timeoutMs);
     if (res.status === 401) { onUnauthorized?.(); }
   }
 
@@ -81,7 +81,10 @@ async function request<T>(method: string, path: string, body?: unknown, auth = t
 }
 
 const get = <T>(p: string) => request<T>('GET', p);
-const post = <T>(p: string, b?: unknown, auth = true) => request<T>('POST', p, b ?? {}, auth);
+const post = <T>(p: string, b?: unknown, auth = true, timeoutMs = TIMEOUT_MS) => request<T>('POST', p, b ?? {}, auth, timeoutMs);
+
+// Pendaftaran antrean bisa lama di RS yang integrasi BPJS Antrean-nya lambat (dijalankan sinkron di server).
+const DAFTAR_ANTRIAN_TIMEOUT_MS = 90000;
 
 export type RegisterInput = {
   nik: string; nama: string; tanggal_lahir: string; jenis_kelamin: 'L' | 'P'; nomor_hp: string; password: string;
@@ -123,7 +126,7 @@ export const api = {
   poliklinik: () => get<Poliklinik[]>('/poliklinik'),
   jadwal: (poliId: string, tanggal?: string) => get<Jadwal>(`/poliklinik/${poliId}/jadwal${tanggal ? `?tanggal=${tanggal}` : ''}`),
   caraBayar: () => get<CaraBayar>('/cara-bayar'),
-  daftarAntrian: (p: { poliklinik_id: string; dokter_id: string; cara_bayar: string; perusahaan_asuransi_id?: string }) => post<Antrian>('/antrian', p),
+  daftarAntrian: (p: { poliklinik_id: string; dokter_id: string; cara_bayar: string; perusahaan_asuransi_id?: string }) => post<Antrian>('/antrian', p, true, DAFTAR_ANTRIAN_TIMEOUT_MS),
   antrianAktif: () => get<Antrian[]>('/antrian?aktif=1'),
   antrian: (id: string) => get<Antrian>(`/antrian/${id}`),
   antrianStatus: (id: string) => get<AntrianStatus>(`/antrian/${id}/status`),

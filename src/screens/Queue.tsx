@@ -69,6 +69,14 @@ export default function Queue() {
       set({ poliId: null, dokterId: null });
       go('live', { antrianId: a.id });
     } catch (e) {
+      // Koneksi putus/timeout: antrean bisa saja sudah terbentuk di server. Cek dulu sebelum menampilkan error.
+      if ((e as { status?: number }).status === 0) {
+        try {
+          const aktif = await api.antrianAktif();
+          const baru = aktif[0]; // antrean aktif hari ini: sudah terbentuk walau responsnya tidak sampai
+          if (baru) { set({ poliId: null, dokterId: null }); go('live', { antrianId: baru.id }); return; }
+        } catch { /* jatuh ke pesan error */ }
+      }
       setErr((e as Error).message);
       Alert.alert('Tidak dapat mengambil antrian', (e as Error).message);
     } finally {
