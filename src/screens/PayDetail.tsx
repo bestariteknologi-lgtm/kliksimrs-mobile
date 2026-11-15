@@ -8,13 +8,13 @@ import { Page } from '../components/Screen';
 import { Button, Card, Header, Icon, T } from '../components/ui';
 import { rupiah } from '../components/Form';
 
-const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+const fmt = (n: number) => { const s = Math.max(0, Math.floor(n)); return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; };
 const POLL_MS = 3000;
 
 export default function PayDetail() {
   const { go, payment } = useStore();
   const [p, setP] = useState(payment);
-  const [left, setLeft] = useState(payment?.sisa_detik ?? 0);
+  const [left, setLeft] = useState(Math.floor(payment?.sisa_detik ?? 0));
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {

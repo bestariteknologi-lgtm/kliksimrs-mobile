@@ -56,9 +56,9 @@ export default function Register() {
       {step === 1 ? (
         <>
           <Text style={T.muted}>Pasien lama: gunakan data yang sama dengan di rumah sakit. Pasien baru akan didaftarkan otomatis.</Text>
-          <Field label="NIK (16 digit)" value={f.nik} onChangeText={t => up({ nik: t.replace(/\D/g, '').slice(0, 16) })} keyboardType="number-pad" />
-          <Field label="Nama lengkap" value={f.nama} onChangeText={t => up({ nama: t })} autoCapitalize="words" />
-          <Field label="Tanggal lahir (TTTT-BB-HH)" value={f.tanggal_lahir} onChangeText={t => up({ tanggal_lahir: t })} placeholder="1990-01-31" keyboardType="numbers-and-punctuation" />
+          <Field label="NIK (16 digit)" value={f.nik} onChangeText={t => up({ nik: t.replace(/\D/g, '').slice(0, 16) })} keyboardType="number-pad" placeholder="16 digit sesuai KTP" />
+          <Field label="Nama lengkap" value={f.nama} onChangeText={t => up({ nama: t })} autoCapitalize="words" placeholder="Sesuai KTP" />
+          <Field label="Tanggal lahir (TTTT-BB-HH)" value={f.tanggal_lahir} onChangeText={t => up({ tanggal_lahir: t })} placeholder="Contoh: 1990-01-31" keyboardType="numbers-and-punctuation" />
           <View style={{ gap: 8 }}>
             <Text style={T.label}>Jenis kelamin</Text>
             <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -67,15 +67,15 @@ export default function Register() {
             </View>
           </View>
           <Field label="Nomor WhatsApp" value={f.nomor_hp} onChangeText={t => up({ nomor_hp: t })} keyboardType="phone-pad" placeholder="08xxxxxxxxxx" />
-          <Field label="No. BPJS (opsional)" value={f.nomor_bpjs} onChangeText={t => up({ nomor_bpjs: t.replace(/\D/g, '').slice(0, 13) })} keyboardType="number-pad" />
-          <Field label="Kata sandi (min. 8 karakter)" value={f.password} onChangeText={t => up({ password: t })} secureTextEntry />
+          <Field label="No. BPJS (opsional)" value={f.nomor_bpjs} onChangeText={t => up({ nomor_bpjs: t.replace(/\D/g, '').slice(0, 13) })} keyboardType="number-pad" placeholder="13 digit (jika ada)" />
+          <Field label="Kata sandi (min. 8 karakter)" value={f.password} onChangeText={t => up({ password: t })} secureTextEntry placeholder="Minimal 8 karakter" />
           <ErrorText text={err} />
           <Button title={busy ? 'Mengirim kode…' : 'Kirim kode verifikasi'} onPress={busy ? () => undefined : kirimKode} />
         </>
       ) : (
         <>
           <Text style={T.body}>Kode verifikasi 6 digit sudah dikirim ke WhatsApp <Text style={{ fontWeight: '800' }}>{f.nomor_hp}</Text>.</Text>
-          <Field label="Kode verifikasi" value={kode} onChangeText={t => setKode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" />
+          <Field label="Kode verifikasi" value={kode} onChangeText={t => setKode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" placeholder="6 digit dari WhatsApp" />
           <ErrorText text={err} />
           <Button title={busy ? 'Memproses…' : 'Verifikasi & daftar'} onPress={busy ? () => undefined : daftar} />
           <Text style={[T.muted, { textAlign: 'center' }]} onPress={busy ? undefined : () => { setErr(null); void kirimKode(); }}>

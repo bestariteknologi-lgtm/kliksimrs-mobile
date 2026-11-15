@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme';
@@ -16,6 +16,13 @@ export default function Login() {
   const [pw, setPw] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  // Nama RS dari server (satu server = satu RS); config.hospitalName hanya cadangan bila server tidak terjangkau.
+  const [rs, setRs] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    let hidup = true;
+    api.info().then(i => { if (hidup) setRs(i.nama_rs?.trim() || config.hospitalName); }).catch(() => { if (hidup) setRs(config.hospitalName); });
+    return () => { hidup = false; };
+  }, []);
 
   const enter = async () => {
     if (!identitas.trim() || !pw) { setErr('Isi NIK / No. BPJS / No. Rekam Medis dan kata sandi.'); return; }
@@ -34,8 +41,9 @@ export default function Login() {
         <View style={{ backgroundColor: colors.primary, paddingTop: insets.top + 32, paddingHorizontal: 28, paddingBottom: 32,
           borderBottomLeftRadius: 36, borderBottomRightRadius: 36, gap: 14 }}>
           <Logo size={72} radius={20} />
-          <Text style={{ color: '#fff', fontSize: 30, fontWeight: '800', lineHeight: 35 }}>Selamat datang di {config.appName}</Text>
-          <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700', opacity: 0.92 }}>{config.hospitalName}</Text>
+          <Text accessibilityRole="header" style={{ color: '#fff', fontSize: 30, fontWeight: '800', lineHeight: 35 }}>
+            Selamat datang{rs ? ` di ${rs}` : ''}
+          </Text>
           <Text style={{ color: '#fff', fontSize: 15, lineHeight: 22, opacity: 0.92 }}>
             Daftar berobat, lihat rekam medis, dan bayar tagihan dari ponsel Anda.
           </Text>
@@ -43,8 +51,8 @@ export default function Login() {
         <View style={{ padding: 28, paddingTop: 26, gap: 16 }}>
           <Text style={{ fontSize: 20, fontWeight: '700', color: colors.text }}>Masuk</Text>
           <Field label="NIK / No. BPJS / No. Rekam Medis" value={identitas} onChangeText={setIdentitas}
-            autoCapitalize="none" keyboardType="number-pad" />
-          <Field label="Kata sandi" value={pw} onChangeText={setPw} secureTextEntry />
+            autoCapitalize="none" keyboardType="number-pad" placeholder="Masukkan NIK, No. BPJS, atau No. RM" />
+          <Field label="Kata sandi" value={pw} onChangeText={setPw} secureTextEntry placeholder="Masukkan kata sandi" />
           <ErrorText text={err} />
           <Button title={busy ? 'Memproses…' : 'Masuk'} onPress={busy ? () => undefined : enter} />
           <Pressable accessibilityRole="button" onPress={() => go('forgot')} style={{ alignItems: 'center', minHeight: 40, justifyContent: 'center' }}>

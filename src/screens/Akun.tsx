@@ -47,16 +47,16 @@ export default function Akun() {
       <Card style={{ gap: 12 }}>
         <Text style={T.h3}>Data diri</Text>
         <Text style={T.muted}>Nama, NIK, dan tanggal lahir hanya dapat diubah melalui loket pendaftaran.</Text>
-        <Field label="Nomor HP" value={hp} onChangeText={setHp} keyboardType="phone-pad" />
-        <Field label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-        <Field label="Alamat" value={alamat} onChangeText={setAlamat} />
+        <Field label="Nomor HP" value={hp} onChangeText={setHp} keyboardType="phone-pad" placeholder="08xxxxxxxxxx" />
+        <Field label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" placeholder="nama@email.com" />
+        <Field label="Alamat" value={alamat} onChangeText={setAlamat} placeholder="Alamat tempat tinggal" />
         <ErrorText text={err.profil} />
         <Button title={busy === 'profil' ? 'Menyimpan…' : 'Simpan data diri'} onPress={busy ? () => undefined : simpanProfil} />
       </Card>
       <Card style={{ gap: 12 }}>
         <Text style={T.h3}>Ubah kata sandi</Text>
-        <Field label="Kata sandi lama" value={lama} onChangeText={setLama} secureTextEntry />
-        <Field label="Kata sandi baru (min. 8 karakter)" value={baru} onChangeText={setBaru} secureTextEntry />
+        <Field label="Kata sandi lama" value={lama} onChangeText={setLama} secureTextEntry placeholder="Masukkan kata sandi saat ini" />
+        <Field label="Kata sandi baru (min. 8 karakter)" value={baru} onChangeText={setBaru} secureTextEntry placeholder="Minimal 8 karakter" />
         <ErrorText text={err.sandi} />
         <Button title={busy === 'sandi' ? 'Menyimpan…' : 'Ubah kata sandi'} variant="outline" onPress={busy ? () => undefined : simpanSandi} />
       </Card>
