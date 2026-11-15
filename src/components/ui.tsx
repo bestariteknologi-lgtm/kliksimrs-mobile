@@ -17,6 +17,7 @@ const PATHS: Record<string, React.ReactNode> = {
   check: <Path d="M5 12l5 5 9-10" />,
   clock: <><Circle cx="12" cy="12" r="9" /><Path d="M12 7v5l3 2" /></>,
   finger: <Path d="M12 11a3 3 0 0 1 3 3v2M9 14a3 3 0 0 1 6 0M7 17a6 6 0 0 1-1-5 6 6 0 0 1 12 0M5 20a9 9 0 0 1-1-8 8 8 0 0 1 16 0" />,
+  route: <><Circle cx="6" cy="19" r="2" /><Circle cx="18" cy="5" r="2" /><Path d="M8 19h7.5a3.5 3.5 0 0 0 0-7h-7a3.5 3.5 0 0 1 0-7H16" /></>,
   bell: <Path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />,
   qr: <Path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM20 14v7M14 20h3M17 17h3M5.5 5.5h2v2h-2zM16.5 5.5h2v2h-2zM5.5 16.5h2v2h-2z" />,
 };

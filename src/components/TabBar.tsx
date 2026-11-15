@@ -6,14 +6,14 @@ import { Screen, useStore } from '../store';
 import { Icon } from './ui';
 
 const TABS: { key: string; label: string; icon: string; target: Screen; match: Screen[] }[] = [
-  { key: 'home', label: 'Beranda', icon: 'home', target: 'home', match: ['home', 'ticket'] },
-  { key: 'queue', label: 'Antrian', icon: 'ticket', target: 'queue', match: ['queue'] },
-  { key: 'records', label: 'Rekam', icon: 'doc', target: 'records', match: ['records', 'lab'] },
+  { key: 'home', label: 'Beranda', icon: 'home', target: 'home', match: ['home', 'kunjungan'] },
+  { key: 'queue', label: 'Antrian', icon: 'ticket', target: 'queue', match: ['queue', 'live'] },
+  { key: 'records', label: 'Rekam', icon: 'doc', target: 'records', match: ['records', 'lab', 'ringkasan'] },
   { key: 'pay', label: 'Bayar', icon: 'card', target: 'pay', match: ['pay', 'payDetail', 'success'] },
   { key: 'profile', label: 'Profil', icon: 'user', target: 'profile', match: ['profile'] },
 ];
 
-export const TAB_SCREENS: Screen[] = ['home', 'queue', 'records', 'pay', 'profile'];
+export const TAB_SCREENS: Screen[] = ['home', 'queue', 'live', 'kunjungan', 'records', 'ringkasan', 'pay', 'profile'];
 
 export function TabBar() {
   const { screen, go } = useStore();

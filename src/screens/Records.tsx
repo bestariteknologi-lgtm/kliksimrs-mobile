@@ -11,6 +11,7 @@ import { Empty, ErrorBox, Loading, tanggalPendek } from '../components/Form';
 const TABS = ['Riwayat', 'Hasil Lab', 'Resep', 'Alergi'] as const;
 
 function Riwayat() {
+  const { go } = useStore();
   const { data, error, loading, reload } = useLoad(() => api.kunjungan());
   if (loading && !data) return <Loading />;
   if (error) return <ErrorBox message={error} onRetry={() => reload()} />;
@@ -18,7 +19,8 @@ function Riwayat() {
   return (
     <>
       {data.items.map(v => (
-        <Card key={v.id} style={{ gap: 8 }}>
+        <Pressable key={v.id} accessibilityRole="button" onPress={() => go('ringkasan', { ringkasanId: v.id })}>
+        <Card style={{ gap: 8 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Badge text={v.jenis === 'RAWAT INAP' ? 'Rawat Inap' : 'Rawat Jalan'} />
             <Text style={{ fontSize: 12, color: colors.muted }}>{tanggalPendek(v.tanggal)}</Text>
@@ -27,7 +29,9 @@ function Riwayat() {
           {v.diagnosa.length > 0 ? (
             <Text style={[T.muted, { lineHeight: 20 }]}>Diagnosis: {v.diagnosa.map(d => `${d.nama} (${d.kode})`).join(', ')}</Text>
           ) : <Text style={T.muted}>Diagnosis belum tercatat</Text>}
+          <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>Lihat ringkasan ›</Text>
         </Card>
+        </Pressable>
       ))}
     </>
   );

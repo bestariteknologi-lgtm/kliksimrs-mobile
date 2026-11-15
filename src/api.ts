@@ -1,7 +1,7 @@
 import { config } from './config';
 import { saveToken } from './session';
 import type {
-  Alergi, AuthResult, NotifikasiList, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
+  Alergi, AuthResult, KunjunganHariIni, NotifikasiList, Preferensi, Ringkasan, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
   PayMetode, Pembayaran, Poliklinik, Profil, ResepItem, Tagihan, TagihanDetail,
 } from './types';
 
@@ -105,6 +105,12 @@ export const api = {
   updateProfil: (p: { nomor_hp?: string; email?: string | null; alamat?: string | null }) => request<Profil>('PUT', '/me', p),
   updatePassword: (password_lama: string, password_baru: string) => request<null>('PUT', '/me/password', { password_lama, password_baru }),
   beranda: () => get<Beranda>('/beranda'),
+
+  // --- perjalanan kunjungan
+  kunjunganHariIni: () => get<KunjunganHariIni | null>('/kunjungan/hari-ini'),
+  ringkasan: (id: string) => get<Ringkasan>(`/rekam-medis/kunjungan/${id}/ringkasan`),
+  preferensi: () => get<Preferensi>('/me/preferensi-notifikasi'),
+  updatePreferensi: (p: Partial<Preferensi>) => request<Preferensi>('PUT', '/me/preferensi-notifikasi', p),
 
   // --- notifikasi & perangkat push
   notifikasi: () => get<NotifikasiList>('/notifikasi'),

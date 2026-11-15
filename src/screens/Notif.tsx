@@ -17,7 +17,7 @@ export default function Notif() {
 
   const buka = async (n: Notifikasi) => {
     if (!n.dibaca) { try { await api.bacaNotifikasi(n.id); } catch { /* abaikan */ } }
-    if (n.data?.antrian_id) go('ticket', { antrianId: n.data.antrian_id });
+    if (n.data?.antrian_id) go('live', { antrianId: n.data.antrian_id });
     else if (n.data?.pembayaran_id) go('pay');
     else void reload(true);
   };

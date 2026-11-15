@@ -20,10 +20,13 @@ import Success from './src/screens/Success';
 import Profile from './src/screens/Profile';
 import Notif from './src/screens/Notif';
 import Akun from './src/screens/Akun';
+import Live from './src/screens/Live';
+import Kunjungan from './src/screens/Kunjungan';
+import Ringkasan from './src/screens/Ringkasan';
 
 const SCREENS = {
   splash: Splash, login: Login, register: Register, forgot: Forgot, home: Home, queue: Queue, ticket: Ticket, records: Records,
-  lab: LabDetail, pay: Pay, payDetail: PayDetail, success: Success, profile: Profile, notif: Notif, akun: Akun,
+  lab: LabDetail, pay: Pay, payDetail: PayDetail, success: Success, profile: Profile, notif: Notif, akun: Akun, live: Live, kunjungan: Kunjungan, ringkasan: Ringkasan,
 };
 
 function Root() {

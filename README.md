@@ -19,9 +19,15 @@ gambar di `assets/`: `logo.png` (ikon app + logo di Login/Beranda), `logo-adapti
 Setelah mengganti config/logo, jalankan `npx expo prebuild --platform android --clean` sebelum build native.
 
 ## Alur yang tersedia
-Daftar (OTP WhatsApp) / Masuk / Lupa kata sandi → Beranda → Ambil Antrian (poli, dokter, cara bayar; hari ini saja) →
-Tiket (QR check-in, posisi antrian, batal) → Rekam Medis (riwayat, lab, resep, alergi) → Detail Lab →
-Pembayaran (QRIS / VA / e-wallet — gateway masih dummy, ada tombol simulasi) → Sukses → Profil / Keluar.
+Daftar (OTP WhatsApp) / Masuk / Lupa kata sandi → **Beranda** (kunjungan hari ini, perkiraan dipanggil, perlu perhatian) →
+**Daftar berobat** (poli → dokter → jadwal & penjamin) → **Antrian Live** (posisi, perkiraan dipanggil, check-in,
+preferensi kabar WhatsApp) → Tiket QR → **Alur Kunjungan & Status Obat** (tahapan per unit + status resep farmasi) →
+Rekam Medis (riwayat, lab, resep, alergi) → **Ringkasan Kunjungan** (penjelasan dokter, lab dengan bilah rujukan, obat, kontrol berikutnya) →
+Pembayaran (QRIS / VA / e-wallet — gateway masih dummy — atau bayar di kasir) → Sukses → Notifikasi / Profil.
+
+Desain acuan: artboard "Desain Aplikasi Mobile Pasien SIMRS" (lihat `desain.txt`). Belum ada di backend/aplikasi:
+estimasi biaya tindakan (setuju/tanya), cek kepesertaan & masa berlaku rujukan BPJS, notifikasi "jadwal dokter berubah",
+pengingat minum obat, dan booking tanggal selain hari ini.
 
 ## Struktur
 - `src/store.tsx` — state global + navigasi sederhana (termasuk tombol back Android)

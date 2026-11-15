@@ -47,7 +47,7 @@ export default function Ticket() {
 
   return (
     <Page gap={16}>
-      <Header title="Tiket Antrian" onBack={() => go('home')} />
+      <Header title="Tiket Antrian" onBack={() => go('live')} />
       {loading ? <Loading /> : null}
       {tiket.error || resolve.error ? <ErrorBox message={(tiket.error ?? resolve.error) as string} onRetry={() => { void resolve.reload(); void tiket.reload(); }} /> : null}
       {!loading && !a && !tiket.error && !resolve.error ? <Empty text="Belum ada antrian aktif." /> : null}
@@ -91,7 +91,7 @@ export default function Ticket() {
             {a.status === 'pendaftaran' ? (
               <View style={{ flex: 1 }}><Button title="Batalkan" variant="outline" danger onPress={batal} /></View>
             ) : null}
-            <View style={{ flex: 1 }}><Button title="Ke Beranda" onPress={() => go('home')} /></View>
+            <View style={{ flex: 1 }}><Button title="Antrian live" onPress={() => go('live')} /></View>
           </View>
         </>
       ) : null}

@@ -12,7 +12,7 @@ export type Poliklinik = { id: string; nama: string; nomor_poli: string | null; 
 
 export type DokterJadwal = {
   dokter_id: string; nama: string; spesialis: string | null; jam: string;
-  kuota: number; terpakai: number; sisa_kuota: number | null;
+  kuota: number; terpakai: number; sisa_kuota: number | null; penuh: boolean; perkiraan_dilayani: string | null;
 };
 export type Jadwal = { tanggal: string; bisa_daftar: boolean; dokter: DokterJadwal[] };
 
@@ -22,12 +22,19 @@ export type CaraBayarJenis = CaraBayar['jenis'][number];
 export type Antrian = {
   id: string; kode_pendaftaran: string | null; nomor: string; poliklinik: string | null; dokter: string | null;
   tanggal: string | null; jam_daftar: string | null; cara_bayar: string | null; status: string;
-  sudah_dipanggil: boolean; qr: string;
+  sudah_dipanggil: boolean; sudah_checkin: boolean; qr: string;
 };
+export type PosisiChip = { nomor: string; jenis: 'dilayani' | 'menunggu' | 'saya' };
 export type AntrianStatus = {
   nomor_saya: string; nomor_dipanggil: number | null; antrian_di_depan: number;
   estimasi_menit: number; status: string; sudah_dipanggil: boolean;
+  rata_rata_menit: number;
+  perkiraan_dipanggil: { dari: string; sampai: string; menit: number } | null;
+  posisi: PosisiChip[];
+  checkin: { sudah: boolean; jam: string | null };
+  lokasi: string | null;
 };
+export type Preferensi = { wa_giliran_dekat: boolean; wa_jadwal_berubah: boolean };
 
 export type Beranda = {
   rs: string | null; nama: string | null; nomor_rm: string | null;
@@ -39,14 +46,42 @@ export type KunjunganItem = { id: string; tanggal: string | null; poliklinik: st
 export type KunjunganList = { items: KunjunganItem[]; page: number; last_page: number };
 export type ResepItem = { nama: string; jumlah: number; aturan: string | null; tanggal?: string | null; dokter?: string | null };
 export type LabItem = { id: string; tanggal: string; jumlah_indikator: number; jumlah_abnormal: number };
+export type LabStatus = 'normal' | 'di_atas' | 'di_bawah' | null;
 export type LabDetail = {
   id: string; tanggal: string | null;
-  hasil: { nama: string; hasil: string | null; satuan: string | null; nilai_rujukan: string | null; abnormal: boolean; catatan: string | null }[];
+  hasil: { nama: string; hasil: string | null; satuan: string | null; nilai_rujukan: string | null; status: LabStatus; abnormal: boolean; catatan: string | null }[];
+};
+
+export type Ringkasan = {
+  id: string; tanggal: string | null; poliklinik: string | null; dokter: string | null;
+  penjelasan_dokter: string | null;
+  lab: { nama: string; hasil: string | null; nilai: number | null; satuan: string | null; nilai_rujukan: string | null;
+    batas_min: number | null; batas_maks: number | null; status: LabStatus; abnormal: boolean }[];
+  lab_baru: boolean;
+  obat: { nama: string; jumlah: number; aturan: string | null }[];
+  kontrol_berikutnya: string | null;
+  tersinkron_satusehat: boolean;
+};
+
+export type Tahap = {
+  kode: string; label: string; keterangan: string; selesai: boolean; state: 'selesai' | 'sekarang' | 'menunggu';
+  lokasi?: string | null; antrian_id?: string;
+};
+export type ResepStatus = {
+  nomor: string | null; status: 'diterima' | 'disiapkan' | 'siap' | 'diserahkan'; status_label: string; langkah: 1 | 2 | 3;
+  jam_diterima: string | null; jam_disiapkan: string | null; jam_diambil: string | null;
+  jumlah_obat: number; jumlah_racik: number; item: { nama: string; jumlah: number; aturan: string | null }[];
+};
+export type KunjunganHariIni = {
+  tanggal: string; pendaftaran_id: string; tahap_selesai: number; tahap_total: number; tahapan: Tahap[]; resep: ResepStatus | null;
 };
 export type Alergi = { jenis: string; nama: string; keterangan: string | null };
 
 export type Tagihan = { id: string; invoice: string | null; tanggal: string | null; poliklinik: string | null; total: number; status: 'belum_bayar' | 'lunas' };
-export type TagihanDetail = Tagihan & { items: { label: string; jumlah: number; harga: number; subtotal: number }[] };
+export type TagihanDetail = Tagihan & {
+  items: { label: string; kategori: string; jumlah: number; harga: number; subtotal: number }[];
+  kelompok: { nama: string; total: number }[];
+};
 
 export type PayMetode = 'QRIS' | 'VA' | 'EWALLET';
 export type Pembayaran = {

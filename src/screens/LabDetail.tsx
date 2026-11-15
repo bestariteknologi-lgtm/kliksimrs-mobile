@@ -44,7 +44,7 @@ export default function LabDetail() {
                     </Text>
                     {r.abnormal ? (
                       <Text style={{ alignSelf: 'flex-start', marginTop: 2, fontSize: 11, backgroundColor: colors.warnBg,
-                        color: colors.warnText, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' }}>Di luar rujukan</Text>
+                        color: colors.warnText, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, overflow: 'hidden' }}>{r.status === 'di_bawah' ? 'Di bawah rujukan' : r.status === 'di_atas' ? 'Di atas rujukan' : 'Di luar rujukan'}</Text>
                     ) : null}
                   </View>
                 } />
