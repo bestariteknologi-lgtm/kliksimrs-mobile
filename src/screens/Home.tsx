@@ -118,6 +118,21 @@ export default function Home() {
               </Pressable>
             </View>
           </View>
+        ) : data.beranda.antrian_mendatang ? (
+          <Pressable accessibilityRole="button" onPress={() => go('live', { antrianId: data.beranda.antrian_mendatang!.id })}
+            style={{ backgroundColor: colors.primary, borderRadius: 22, padding: 18, gap: 8 }}>
+            <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', letterSpacing: 0.5, opacity: 0.9 }}>KUNJUNGAN BERIKUTNYA</Text>
+            <Text style={{ color: '#fff', fontSize: 19, fontWeight: '800' }}>Poli {data.beranda.antrian_mendatang.poliklinik}</Text>
+            <Text style={{ color: '#fff', fontSize: 14 }}>
+              {data.beranda.antrian_mendatang.dokter} · {new Date(`${data.beranda.antrian_mendatang.tanggal}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 4 }}>
+              <View style={{ backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 8 }}>
+                <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 15 }}>Antrian {data.beranda.antrian_mendatang.nomor}</Text>
+              </View>
+              <Text style={{ color: '#fff', fontSize: 13 }}>Ketuk untuk lihat detail</Text>
+            </View>
+          </Pressable>
         ) : (
           <View style={{ backgroundColor: colors.primary, borderRadius: 22, padding: 18, gap: 10 }}>
             <Text style={{ color: '#fff', fontSize: 19, fontWeight: '800' }}>Belum ada antrian hari ini</Text>

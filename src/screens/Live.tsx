@@ -82,8 +82,15 @@ export default function Live() {
             <View style={{ backgroundColor: colors.primarySoft, borderRadius: 14, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <Icon name="clock" size={28} />
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={{ fontSize: 12, color: colors.primaryDark, fontWeight: '600' }}>{dipanggil ? 'Status' : 'Perkiraan dipanggil'}</Text>
-                {dipanggil ? (
+                <Text style={{ fontSize: 12, color: colors.primaryDark, fontWeight: '600' }}>{st && !st.hari_ini ? 'Tanggal kunjungan' : dipanggil ? 'Status' : 'Perkiraan dipanggil'}</Text>
+                {st && !st.hari_ini ? (
+                  <>
+                    <Text style={{ fontSize: 20, fontWeight: '800', color: colors.primaryDark }}>
+                      {new Date(`${st.tanggal}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: colors.primaryDark }}>Perkiraan jam dipanggil tampil pada hari kunjungan.</Text>
+                  </>
+                ) : dipanggil ? (
                   <Text style={{ fontSize: 20, fontWeight: '800', color: colors.primaryDark }}>Anda sudah dipanggil</Text>
                 ) : st?.perkiraan_dipanggil ? (
                   <>

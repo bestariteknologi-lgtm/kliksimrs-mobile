@@ -14,7 +14,7 @@ export type DokterJadwal = {
   dokter_id: string; nama: string; spesialis: string | null; jam: string;
   kuota: number; terpakai: number; sisa_kuota: number | null; penuh: boolean; perkiraan_dilayani: string | null;
 };
-export type Jadwal = { tanggal: string; bisa_daftar: boolean; dokter: DokterJadwal[] };
+export type Jadwal = { tanggal: string; bisa_daftar: boolean; libur: string | null; dokter: DokterJadwal[] };
 
 export type CaraBayar = { jenis: ('BPJS' | 'UMUM' | 'ASURANSI')[]; asuransi: { id: string; nama_perusahaan: string }[] };
 export type CaraBayarJenis = CaraBayar['jenis'][number];
@@ -22,12 +22,13 @@ export type CaraBayarJenis = CaraBayar['jenis'][number];
 export type Antrian = {
   id: string; kode_pendaftaran: string | null; nomor: string; poliklinik: string | null; dokter: string | null;
   tanggal: string | null; jam_daftar: string | null; cara_bayar: string | null; status: string;
-  sudah_dipanggil: boolean; sudah_checkin: boolean; qr: string;
+  hari_ini: boolean; sudah_dipanggil: boolean; sudah_checkin: boolean; qr: string;
 };
 export type PosisiChip = { nomor: string; jenis: 'dilayani' | 'menunggu' | 'saya' };
 export type AntrianStatus = {
   nomor_saya: string; nomor_dipanggil: number | null; antrian_di_depan: number;
   estimasi_menit: number; status: string; sudah_dipanggil: boolean;
+  tanggal: string; hari_ini: boolean;
   rata_rata_menit: number;
   perkiraan_dipanggil: { dari: string; sampai: string; menit: number } | null;
   posisi: PosisiChip[];
@@ -39,6 +40,7 @@ export type Preferensi = { wa_giliran_dekat: boolean; wa_jadwal_berubah: boolean
 export type Beranda = {
   rs: string | null; nama: string | null; nomor_rm: string | null;
   antrian_aktif: { id: string; nomor: string; poliklinik: string | null; dokter: string | null; status: string } | null;
+  antrian_mendatang: { id: string; nomor: string; tanggal: string; poliklinik: string | null; dokter: string | null } | null;
 };
 
 export type Diagnosa = { kode: string; nama: string };
