@@ -12,9 +12,9 @@ export type Poliklinik = { id: string; nama: string; nomor_poli: string | null; 
 
 export type DokterJadwal = {
   dokter_id: string; nama: string; spesialis: string | null; jam: string;
-  kuota: number; terpakai: number; sisa_kuota: number | null;
+  kuota: number; terpakai: number; sisa_kuota: number | null; penuh: boolean; perkiraan_dilayani: string | null;
 };
-export type Jadwal = { tanggal: string; bisa_daftar: boolean; dokter: DokterJadwal[] };
+export type Jadwal = { tanggal: string; bisa_daftar: boolean; libur: string | null; dokter: DokterJadwal[] };
 
 export type CaraBayar = { jenis: ('BPJS' | 'UMUM' | 'ASURANSI')[]; asuransi: { id: string; nama_perusahaan: string }[] };
 export type CaraBayarJenis = CaraBayar['jenis'][number];
@@ -22,16 +22,25 @@ export type CaraBayarJenis = CaraBayar['jenis'][number];
 export type Antrian = {
   id: string; kode_pendaftaran: string | null; nomor: string; poliklinik: string | null; dokter: string | null;
   tanggal: string | null; jam_daftar: string | null; cara_bayar: string | null; status: string;
-  sudah_dipanggil: boolean; qr: string;
+  hari_ini: boolean; sudah_dipanggil: boolean; sudah_checkin: boolean; qr: string;
 };
+export type PosisiChip = { nomor: string; jenis: 'dilayani' | 'menunggu' | 'saya' };
 export type AntrianStatus = {
   nomor_saya: string; nomor_dipanggil: number | null; antrian_di_depan: number;
   estimasi_menit: number; status: string; sudah_dipanggil: boolean;
+  tanggal: string; hari_ini: boolean;
+  rata_rata_menit: number;
+  perkiraan_dipanggil: { dari: string; sampai: string; menit: number } | null;
+  posisi: PosisiChip[];
+  checkin: { sudah: boolean; jam: string | null };
+  lokasi: string | null;
 };
+export type Preferensi = { wa_giliran_dekat: boolean; wa_jadwal_berubah: boolean };
 
 export type Beranda = {
   rs: string | null; nama: string | null; nomor_rm: string | null;
   antrian_aktif: { id: string; nomor: string; poliklinik: string | null; dokter: string | null; status: string } | null;
+  antrian_mendatang: { id: string; nomor: string; tanggal: string; poliklinik: string | null; dokter: string | null } | null;
 };
 
 export type Diagnosa = { kode: string; nama: string };
@@ -39,14 +48,42 @@ export type KunjunganItem = { id: string; tanggal: string | null; poliklinik: st
 export type KunjunganList = { items: KunjunganItem[]; page: number; last_page: number };
 export type ResepItem = { nama: string; jumlah: number; aturan: string | null; tanggal?: string | null; dokter?: string | null };
 export type LabItem = { id: string; tanggal: string; jumlah_indikator: number; jumlah_abnormal: number };
+export type LabStatus = 'normal' | 'di_atas' | 'di_bawah' | null;
 export type LabDetail = {
   id: string; tanggal: string | null;
-  hasil: { nama: string; hasil: string | null; satuan: string | null; nilai_rujukan: string | null; abnormal: boolean; catatan: string | null }[];
+  hasil: { nama: string; hasil: string | null; satuan: string | null; nilai_rujukan: string | null; status: LabStatus; abnormal: boolean; catatan: string | null }[];
+};
+
+export type Ringkasan = {
+  id: string; tanggal: string | null; poliklinik: string | null; dokter: string | null;
+  penjelasan_dokter: string | null;
+  lab: { nama: string; hasil: string | null; nilai: number | null; satuan: string | null; nilai_rujukan: string | null;
+    batas_min: number | null; batas_maks: number | null; status: LabStatus; abnormal: boolean }[];
+  lab_baru: boolean;
+  obat: { nama: string; jumlah: number; aturan: string | null }[];
+  kontrol_berikutnya: string | null;
+  tersinkron_satusehat: boolean;
+};
+
+export type Tahap = {
+  kode: string; label: string; keterangan: string; waktu?: string | null; selesai: boolean; state: 'selesai' | 'sekarang' | 'menunggu';
+  lokasi?: string | null; antrian_id?: string;
+};
+export type ResepStatus = {
+  nomor: string | null; status: 'diterima' | 'disiapkan' | 'siap' | 'diserahkan'; status_label: string; langkah: 1 | 2 | 3;
+  jam_diterima: string | null; jam_disiapkan: string | null; jam_diambil: string | null;
+  jumlah_obat: number; jumlah_racik: number; item: { nama: string; jumlah: number; aturan: string | null }[];
+};
+export type KunjunganHariIni = {
+  tanggal: string; pendaftaran_id: string; tahap_selesai: number; tahap_total: number; tahapan: Tahap[]; resep: ResepStatus | null;
 };
 export type Alergi = { jenis: string; nama: string; keterangan: string | null };
 
 export type Tagihan = { id: string; invoice: string | null; tanggal: string | null; poliklinik: string | null; total: number; status: 'belum_bayar' | 'lunas' };
-export type TagihanDetail = Tagihan & { items: { label: string; jumlah: number; harga: number; subtotal: number }[] };
+export type TagihanDetail = Tagihan & {
+  items: { label: string; kategori: string; jumlah: number; harga: number; subtotal: number }[];
+  kelompok: { nama: string; total: number }[];
+};
 
 export type PayMetode = 'QRIS' | 'VA' | 'EWALLET';
 export type Pembayaran = {
@@ -60,3 +97,20 @@ export type Notifikasi = {
   data: { antrian_id?: string; pembayaran_id?: string } | null;
 };
 export type NotifikasiList = { belum_dibaca: number; items: Notifikasi[] };
+
+export type DokterInfo = {
+  dokter_id: string; nama: string; spesialis: string | null; poliklinik_id: string; poliklinik: string; jam: string;
+  kuota: number; terpakai: number; sisa_kuota: number; status: 'tersedia' | 'penuh'; tanggal_berikutnya: string | null;
+};
+export type JadwalDokter = {
+  tanggal: string; bisa_daftar: boolean; libur: string | null; poliklinik: { id: string; nama: string }[];
+  jumlah_dokter: number; dokter: DokterInfo[];
+};
+export type KelasBed = {
+  nama: string; kategori: 'rawat_inap' | 'intensif' | 'isolasi'; total: number; terisi: number;
+  tidak_tersedia: number; tersedia: number; status: 'tersedia' | 'terbatas' | 'penuh';
+};
+export type TempatTidur = { total: number; tersedia: number; terisi: number; kelas: KelasBed[]; diperbarui: string };
+export type InfoRs = {
+  nama_rs: string | null; alamat: string | null; telepon: string | null; cs_whatsapp: string | null; telepon_igd: string | null;
+};

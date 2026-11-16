@@ -9,8 +9,12 @@ import { Badge, Button, Card, Divider, Icon, T } from '../components/ui';
 import { Empty, ErrorBox, Loading, rupiah, tanggalPendek } from '../components/Form';
 import type { PayMetode } from '../types';
 
-const METODE: { key: PayMetode; label: string }[] = [
-  { key: 'QRIS', label: 'QRIS' }, { key: 'VA', label: 'Virtual Account Bank' }, { key: 'EWALLET', label: 'E-wallet' },
+type Metode = PayMetode | 'KASIR';
+const METODE: { key: Metode; label: string; sub: string }[] = [
+  { key: 'QRIS', label: 'QRIS', sub: 'Semua e-wallet & m-banking' },
+  { key: 'VA', label: 'Virtual Account Bank', sub: 'Transfer dari bank mana pun' },
+  { key: 'EWALLET', label: 'E-wallet', sub: 'Setujui di aplikasi e-wallet' },
+  { key: 'KASIR', label: 'Bayar di kasir', sub: 'Tunai atau kartu debit' },
 ];
 
 const History = ({ title, sub, amount, status }: { title: string; sub: string; amount: number; status: string }) => (
@@ -29,8 +33,10 @@ const History = ({ title, sub, amount, status }: { title: string; sub: string; a
 );
 
 export default function Pay() {
-  const { go, set, tagihanId, payMethod } = useStore();
+  const { go, set, tagihanId } = useStore();
   const [busy, setBusy] = useState(false);
+  const [metode, setMetode] = useState<Metode>('QRIS');
+  const [rinci, setRinci] = useState(false);
   const list = useLoad(() => api.tagihan());
   const riwayat = useLoad(() => api.riwayatPembayaran());
 
@@ -41,10 +47,10 @@ export default function Pay() {
   const detail = useLoad(async () => (pilihId ? api.tagihanDetail(pilihId) : null), [pilihId]);
 
   const bayar = async () => {
-    if (!pilihId) return;
+    if (!pilihId || metode === 'KASIR') return;
     setBusy(true);
     try {
-      const p = await api.bayar(pilihId, payMethod);
+      const p = await api.bayar(pilihId, metode);
       go('payDetail', { payment: p });
     } catch (e) {
       Alert.alert('Pembayaran gagal dibuat', (e as Error).message);
@@ -96,32 +102,47 @@ export default function Pay() {
               <Text style={{ fontSize: 32, fontWeight: '800', color: colors.text }}>{rupiah(d.total)}</Text>
             </View>
             <Divider />
-            {d.items.map((i, k) => (
+            {(rinci ? d.items : d.kelompok.map(k => ({ label: k.nama, jumlah: 1, subtotal: k.total }))).map((i, k) => (
               <View key={k} style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
                 <Text style={{ fontSize: 14, color: colors.muted, flexShrink: 1 }}>{i.label}{i.jumlah > 1 ? ` ×${i.jumlah}` : ''}</Text>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }}>{rupiah(i.subtotal)}</Text>
               </View>
             ))}
+            <Pressable accessibilityRole="button" onPress={() => setRinci(v => !v)} style={{ minHeight: 40, justifyContent: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.primary }}>{rinci ? 'Sembunyikan rincian per item' : 'Lihat rincian per item'}</Text>
+            </Pressable>
           </Card>
 
           <Text style={[T.h3, { fontSize: 15 }]}>Metode pembayaran</Text>
           <View style={{ gap: 8 }}>
             {METODE.map(m => {
-              const on = m.key === payMethod;
+              const on = m.key === metode;
               return (
-                <Pressable key={m.key} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => set({ payMethod: m.key })}
-                  style={{ backgroundColor: '#fff', borderRadius: 16, minHeight: 56, paddingHorizontal: 14, flexDirection: 'row',
+                <Pressable key={m.key} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setMetode(m.key)}
+                  style={{ backgroundColor: '#fff', borderRadius: 16, minHeight: 60, paddingHorizontal: 14, flexDirection: 'row',
                     alignItems: 'center', gap: 12, borderWidth: on ? 2 : 1.5, borderColor: on ? colors.primary : colors.border }}>
                   <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name="card" size={20} />
                   </View>
-                  <Text style={{ flex: 1, fontSize: 14, fontWeight: '700', color: colors.text }}>{m.label}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text }}>{m.label}</Text>
+                    <Text style={{ fontSize: 12, color: colors.muted }}>{m.sub}</Text>
+                  </View>
                   <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: on ? 6 : 1.5, borderColor: on ? colors.primary : '#8FA9A4' }} />
                 </Pressable>
               );
             })}
           </View>
-          <Button title={busy ? 'Memproses…' : `Bayar ${rupiah(d.total)}`} onPress={busy ? () => undefined : bayar} />
+          {metode === 'KASIR' ? (
+            <View style={{ backgroundColor: colors.primarySoft, borderRadius: 16, padding: 16, gap: 4 }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.primaryDark }}>Bayar di kasir</Text>
+              <Text style={{ fontSize: 13, lineHeight: 19, color: '#0B3D38' }}>
+                Tunjukkan nomor pendaftaran {d.invoice ?? ''} kepada petugas kasir, lalu bayar tunai atau dengan kartu debit.
+              </Text>
+            </View>
+          ) : (
+            <Button title={busy ? 'Memproses…' : `Bayar ${rupiah(d.total)}`} onPress={busy ? () => undefined : bayar} />
+          )}
         </>
       ) : null}
 

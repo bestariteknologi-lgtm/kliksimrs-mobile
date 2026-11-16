@@ -42,7 +42,7 @@ export default function Forgot() {
       {step === 1 ? (
         <>
           <Text style={T.muted}>Kode verifikasi dikirim ke WhatsApp yang terdaftar pada akun Anda.</Text>
-          <Field label="NIK (16 digit)" value={nik} onChangeText={t => setNik(t.replace(/\D/g, '').slice(0, 16))} keyboardType="number-pad" />
+          <Field label="NIK (16 digit)" value={nik} onChangeText={t => setNik(t.replace(/\D/g, '').slice(0, 16))} keyboardType="number-pad" placeholder="16 digit sesuai KTP" />
           <Field label="Nomor WhatsApp terdaftar" value={hp} onChangeText={setHp} keyboardType="phone-pad" placeholder="08xxxxxxxxxx" />
           <ErrorText text={err} />
           <Button title={busy ? 'Mengirim…' : 'Kirim kode'} onPress={busy ? () => undefined : kirim} />
@@ -50,8 +50,8 @@ export default function Forgot() {
       ) : (
         <>
           <Text style={T.muted}>Jika data cocok, kode 6 digit sudah dikirim ke WhatsApp Anda.</Text>
-          <Field label="Kode verifikasi" value={kode} onChangeText={t => setKode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" />
-          <Field label="Kata sandi baru (min. 8 karakter)" value={pw} onChangeText={setPw} secureTextEntry />
+          <Field label="Kode verifikasi" value={kode} onChangeText={t => setKode(t.replace(/\D/g, '').slice(0, 6))} keyboardType="number-pad" placeholder="6 digit dari WhatsApp" />
+          <Field label="Kata sandi baru (min. 8 karakter)" value={pw} onChangeText={setPw} secureTextEntry placeholder="Minimal 8 karakter" />
           <ErrorText text={err} />
           <Button title={busy ? 'Memproses…' : 'Simpan kata sandi baru'} onPress={busy ? () => undefined : reset} />
         </>

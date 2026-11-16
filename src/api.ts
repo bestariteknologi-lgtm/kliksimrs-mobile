@@ -1,7 +1,7 @@
 import { config } from './config';
 import { saveToken } from './session';
 import type {
-  Alergi, AuthResult, NotifikasiList, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
+  Alergi, AuthResult, InfoRs, JadwalDokter, TempatTidur, KunjunganHariIni, NotifikasiList, Preferensi, Ringkasan, Antrian, AntrianStatus, Beranda, CaraBayar, Jadwal, KunjunganItem, KunjunganList, LabDetail, LabItem,
   PayMetode, Pembayaran, Poliklinik, Profil, ResepItem, Tagihan, TagihanDetail,
 } from './types';
 
@@ -25,9 +25,9 @@ export const setUnauthorizedHandler = (fn: (() => void) | null) => { onUnauthori
 /** Pasang token dari penyimpanan tanpa menulis ulang ke penyimpanan. */
 export const restoreToken = (t: string | null) => { token = t; };
 
-async function raw(method: string, path: string, body?: unknown, auth = true): Promise<Response> {
+async function raw(method: string, path: string, body?: unknown, auth = true, timeoutMs = TIMEOUT_MS): Promise<Response> {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     return await fetch(`${BASE}${path}`, {
       method,
@@ -63,11 +63,11 @@ async function tryRefresh(): Promise<boolean> {
   return refreshing;
 }
 
-async function request<T>(method: string, path: string, body?: unknown, auth = true): Promise<T> {
-  let res = await raw(method, path, body, auth);
+async function request<T>(method: string, path: string, body?: unknown, auth = true, timeoutMs = TIMEOUT_MS): Promise<T> {
+  let res = await raw(method, path, body, auth, timeoutMs);
 
   if (res.status === 401 && auth && token && path !== '/auth/refresh') {
-    if (await tryRefresh()) res = await raw(method, path, body, auth);
+    if (await tryRefresh()) res = await raw(method, path, body, auth, timeoutMs);
     if (res.status === 401) { onUnauthorized?.(); }
   }
 
@@ -81,7 +81,10 @@ async function request<T>(method: string, path: string, body?: unknown, auth = t
 }
 
 const get = <T>(p: string) => request<T>('GET', p);
-const post = <T>(p: string, b?: unknown, auth = true) => request<T>('POST', p, b ?? {}, auth);
+const post = <T>(p: string, b?: unknown, auth = true, timeoutMs = TIMEOUT_MS) => request<T>('POST', p, b ?? {}, auth, timeoutMs);
+
+// Pendaftaran antrean bisa lama di RS yang integrasi BPJS Antrean-nya lambat (dijalankan sinkron di server).
+const DAFTAR_ANTRIAN_TIMEOUT_MS = 90000;
 
 export type RegisterInput = {
   nik: string; nama: string; tanggal_lahir: string; jenis_kelamin: 'L' | 'P'; nomor_hp: string; password: string;
@@ -90,7 +93,10 @@ export type RegisterInput = {
 
 export const api = {
   // --- auth (publik)
-  info: () => request<{ nama_rs: string | null; alamat: string | null; telepon: string | null }>('GET', '/info', undefined, false),
+  info: () => request<InfoRs>('GET', '/info', undefined, false),
+  jadwalDokter: (tanggal: string, q = '', poliklinikId = '') =>
+    get<JadwalDokter>(`/jadwal-dokter?tanggal=${tanggal}${q ? `&q=${encodeURIComponent(q)}` : ''}${poliklinikId ? `&poliklinik_id=${poliklinikId}` : ''}`),
+  tempatTidur: () => get<TempatTidur>('/tempat-tidur'),
   checkIdentitas: (nik: string) => post<{ terdaftar_di_rs: boolean; punya_akun: boolean }>('/auth/check-identitas', { nik }, false),
   otpKirim: (p: { nik: string; nomor_hp: string; purpose: 'register' | 'reset_password' }) => post<null>('/auth/otp/kirim', p, false),
   otpVerifikasi: (p: { nomor_hp: string; purpose: 'register' | 'reset_password'; kode: string }) =>
@@ -102,9 +108,15 @@ export const api = {
 
   // --- akun
   me: () => get<Profil>('/me'),
-  updateProfil: (p: { nomor_hp?: string; email?: string | null; alamat?: string | null }) => request<Profil>('PUT', '/me', p),
+  updateProfil: (p: { nomor_hp?: string; email?: string | null; alamat?: string | null; nik?: string; nomor_bpjs?: string | null; password?: string }) => request<Profil>('PUT', '/me', p),
   updatePassword: (password_lama: string, password_baru: string) => request<null>('PUT', '/me/password', { password_lama, password_baru }),
   beranda: () => get<Beranda>('/beranda'),
+
+  // --- perjalanan kunjungan
+  kunjunganHariIni: () => get<KunjunganHariIni | null>('/kunjungan/hari-ini'),
+  ringkasan: (id: string) => get<Ringkasan>(`/rekam-medis/kunjungan/${id}/ringkasan`),
+  preferensi: () => get<Preferensi>('/me/preferensi-notifikasi'),
+  updatePreferensi: (p: Partial<Preferensi>) => request<Preferensi>('PUT', '/me/preferensi-notifikasi', p),
 
   // --- notifikasi & perangkat push
   notifikasi: () => get<NotifikasiList>('/notifikasi'),
@@ -117,8 +129,9 @@ export const api = {
   poliklinik: () => get<Poliklinik[]>('/poliklinik'),
   jadwal: (poliId: string, tanggal?: string) => get<Jadwal>(`/poliklinik/${poliId}/jadwal${tanggal ? `?tanggal=${tanggal}` : ''}`),
   caraBayar: () => get<CaraBayar>('/cara-bayar'),
-  daftarAntrian: (p: { poliklinik_id: string; dokter_id: string; cara_bayar: string; perusahaan_asuransi_id?: string }) => post<Antrian>('/antrian', p),
+  daftarAntrian: (p: { poliklinik_id: string; dokter_id: string; cara_bayar: string; tanggal?: string; perusahaan_asuransi_id?: string }) => post<Antrian>('/antrian', p, true, DAFTAR_ANTRIAN_TIMEOUT_MS),
   antrianAktif: () => get<Antrian[]>('/antrian?aktif=1'),
+  antrianMendatang: () => get<Antrian[]>('/antrian?mendatang=1'),
   antrian: (id: string) => get<Antrian>(`/antrian/${id}`),
   antrianStatus: (id: string) => get<AntrianStatus>(`/antrian/${id}/status`),
   batalAntrian: (id: string) => request<null>('DELETE', `/antrian/${id}`),
