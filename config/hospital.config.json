@@ -1,8 +1,7 @@
 {
-  "_catatan": "DUMMY. Ganti nilai ini per rumah sakit sebelum build. Logo: timpa assets/logo.png (1024x1024, PNG).",
   "appName": "KlikSIMRS",
-  "hospitalName": "RS Contoh Sehat",
-  "apiBaseUrl": "http://192.168.1.100:8000/api",
+  "hospitalName": "RSUD Cerah Medika",
+  "apiBaseUrl": "https://rsud-cerah-medika.kliksimrs.com",
   "primaryColor": "#0F766E",
   "androidPackage": "id.kliksimrs.mobile",
   "iosBundleId": "id.kliksimrs.mobile"
