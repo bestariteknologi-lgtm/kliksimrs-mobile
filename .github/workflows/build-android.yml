@@ -1,0 +1,41 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:        # jalankan manual dari tab Actions
+  push:
+    tags: ['v*']            # atau otomatis saat membuat tag versi, mis. v0.1.0
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci
+      - run: npx tsc --noEmit
+
+      # Konfigurasi RS (nama, apiBaseUrl, logo) dibaca dari config/hospital.config.json dan assets/
+      - run: npx expo prebuild --platform android --no-install --clean
+        env:
+          CI: '1'
+
+      - name: Build APK release
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kliksimrs-android-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
