@@ -3,7 +3,7 @@
 export type Profil = {
   id: string; pasien_id: string; nama: string; inisial: string; nomor_rm: string | null;
   nik: string | null; nomor_bpjs: string | null; tanggal_lahir: string | null; umur: number | null;
-  jenis_kelamin: string | null; nomor_hp: string | null; email: string | null; alamat: string | null;
+  jenis_kelamin: string | null; nomor_hp: string | null; nomor_hp_terverifikasi?: boolean; email: string | null; alamat: string | null;
 };
 
 export type AuthResult = { token: string; token_type: string; expires_in: number; profil: Profil; pasien_baru?: boolean };

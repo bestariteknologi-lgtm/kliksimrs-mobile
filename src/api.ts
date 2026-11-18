@@ -88,7 +88,7 @@ const DAFTAR_ANTRIAN_TIMEOUT_MS = 90000;
 
 export type RegisterInput = {
   nik: string; nama: string; tanggal_lahir: string; jenis_kelamin: 'L' | 'P'; nomor_hp: string; password: string;
-  otp_token: string; email?: string; alamat?: string; nomor_bpjs?: string; nama_ibu?: string;
+  email?: string; alamat?: string; nomor_bpjs?: string; nama_ibu?: string;
 };
 
 export const api = {
@@ -101,6 +101,9 @@ export const api = {
   otpKirim: (p: { nik: string; nomor_hp: string; purpose: 'register' | 'reset_password' }) => post<null>('/auth/otp/kirim', p, false),
   otpVerifikasi: (p: { nomor_hp: string; purpose: 'register' | 'reset_password'; kode: string }) =>
     post<{ otp_token: string; berlaku_menit: number }>('/auth/otp/verifikasi', p, false),
+  // Verifikasi nomor WhatsApp akun yang baru dibuat (butuh token dari register).
+  hpOtpKirim: () => post<null>('/me/otp/kirim'),
+  hpOtpVerifikasi: (kode: string) => post<Profil>('/me/otp/verifikasi', { kode }),
   register: (p: RegisterInput) => post<AuthResult>('/auth/register', p, false),
   login: (identitas: string, password: string) => post<AuthResult>('/auth/login', { identitas, password }, false),
   resetPassword: (p: { nik: string; nomor_hp: string; otp_token: string; password_baru: string }) => post<null>('/auth/reset-password', p, false),

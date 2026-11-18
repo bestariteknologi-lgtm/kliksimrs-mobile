@@ -6,7 +6,7 @@ import { registerPush, unregisterPush } from './push';
 import type { AuthResult, CaraBayarJenis, PayMetode, Pembayaran, Profil } from './types';
 
 export type Screen =
-  | 'splash' | 'login' | 'register' | 'forgot' | 'home' | 'queue' | 'ticket' | 'records' | 'lab'
+  | 'splash' | 'login' | 'register' | 'verifikasiHp' | 'forgot' | 'home' | 'queue' | 'ticket' | 'records' | 'lab'
   | 'pay' | 'payDetail' | 'success' | 'profile' | 'notif' | 'akun' | 'live' | 'kunjungan' | 'ringkasan' | 'jadwalDokter' | 'tempatTidur';
 
 type State = {

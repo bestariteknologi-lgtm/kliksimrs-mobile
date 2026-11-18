@@ -8,6 +8,7 @@ import { TAB_SCREENS, TabBar } from './src/components/TabBar';
 import Splash from './src/screens/Splash';
 import Login from './src/screens/Login';
 import Register from './src/screens/Register';
+import VerifikasiHp from './src/screens/VerifikasiHp';
 import Forgot from './src/screens/Forgot';
 import Home from './src/screens/Home';
 import Queue from './src/screens/Queue';
@@ -27,7 +28,7 @@ import JadwalDokter from './src/screens/JadwalDokter';
 import TempatTidur from './src/screens/TempatTidur';
 
 const SCREENS = {
-  splash: Splash, login: Login, register: Register, forgot: Forgot, home: Home, queue: Queue, ticket: Ticket, records: Records,
+  splash: Splash, login: Login, register: Register, verifikasiHp: VerifikasiHp, forgot: Forgot, home: Home, queue: Queue, ticket: Ticket, records: Records,
   lab: LabDetail, pay: Pay, payDetail: PayDetail, success: Success, profile: Profile, notif: Notif, akun: Akun, live: Live, kunjungan: Kunjungan, ringkasan: Ringkasan, jadwalDokter: JadwalDokter, tempatTidur: TempatTidur,
 };
 
