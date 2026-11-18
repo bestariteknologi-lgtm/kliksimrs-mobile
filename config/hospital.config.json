@@ -1,7 +1,7 @@
 {
   "appName": "KlikSIMRS",
   "hospitalName": "RSUD Cerah Medika",
-  "apiBaseUrl": "https://rsud-cerah-medika.kliksimrs.com",
+  "apiBaseUrl": "https://rsud-cerah-medika.kliksimrs.com/api",
   "primaryColor": "#0F766E",
   "androidPackage": "id.kliksimrs.mobile",
   "iosBundleId": "id.kliksimrs.mobile"
